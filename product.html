@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل المنتج - SunStyle Algeria</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        /* CSS from previous version - no changes needed here */
+        :root { --color-primary: #111827; --color-secondary: #4f46e5; --color-background: #f9fafb; --color-surface: #ffffff; --color-border: #e5e7eb; --color-text-light: #6b7280; --color-star: #f59e0b; --color-success: #10b981; }
+        body { font-family: 'Inter', sans-serif; direction: rtl; background: var(--color-background); color: var(--color-primary); margin: 0; }
+        .page-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .product-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .gallery-col { position: sticky; top: 2rem; }
+        .main-image-wrapper img { width: 100%; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .info-col { }
+        .product-title { font-size: 2.5rem; font-weight: 800; }
+        .form-container { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 2rem; margin-top: 2rem; }
+        .summary-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--color-border); }
+        .summary-row.total { font-weight: 800; font-size: 1.2rem; border-top: 2px solid var(--color-primary); }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; }
+        .form-group input, .form-group select { width: 100%; padding: 0.9rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 1rem; }
+        .btn-submit-order { background: var(--color-primary); color: white; padding: 1rem; border: none; border-radius: 8px; width: 100%; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
+        .success-container { text-align: center; display: none; padding: 2rem; border: 1px solid #ccc; border-radius: 16px; }
+        .alert { padding: 1rem; background: #f8d7da; color: #721c24; border-radius: 8px; margin-bottom: 1rem; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+    <div class="product-main-grid" id="product-main-grid">
+        <div class="gallery-col">
+            <div class="main-image-wrapper"><img id="main-product-image" src=""></div>
+        </div>
+        <div class="info-col">
+            <h1 id="product-title"></h1>
+            <div class="form-container" id="form-container">
+                <div class="order-summary">
+                    <div class="summary-row"><span>سعر المنتج</span><span id="summary-product-price">0 دج</span></div>
+                    <div class="summary-row"><span>سعر الشحن</span><span id="summary-shipping-price">0 دج</span></div>
+                    <div class="summary-row total"><span>المجموع الإجمالي</span><span id="summary-total-price">0 دج</span></div>
+                </div>
+                <div id="orderAlert" class="alert"></div>
+                <form id="orderForm">
+                    <input type="hidden" id="productId" name="product_id">
+                    <input type="hidden" id="productPrice" name="product_price">
+                    <input type="hidden" id="shippingCost" name="shipping_cost" value="0">
+                    <!-- THE FIX: This hidden input will hold the wilaya name -->
+                    <input type="hidden" id="wilayaNameInput" name="wilaya_name" value="">
+                    
+                    <div class="form-group"><label for="customerName">الاسم الكامل*</label><input type="text" id="customerName" name="customer_name" required></div>
+                    <div class="form-group"><label for="phone">رقم الهاتف*</label><input type="tel" id="phone" name="phone" required></div>
+                    <div class="form-group"><label for="wilaya">الولاية*</label><select id="wilaya" name="wilaya" required><option value="">-- اختر ولاية التوصيل --</option></select></div>
+                    <div class="form-group"><label for="address">العنوان الكامل*</label><input type="text" id="address" name="address" required></div>
+                    <button type="submit" class="btn-submit-order" id="submit-button">اطلب الآن</button>
+                </form>
+            </div>
+            <div class="success-container" id="success-container">
+                <h2>تم استلام طلبك بنجاح!</h2>
+                <p>سنتصل بك خلال 24 ساعة لتأكيد الطلبية.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentProduct = null;
+    let shippingRates = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        if (!productId) { document.body.innerHTML = '<h1>خطأ: المنتج غير محدد.</h1>'; return; }
+
+        try {
+            const [productData, shippingData] = await Promise.all([
+                fetch(`api/get_products.php?id=${productId}`).then(res => res.json()),
+                fetch('api/get_shipping_rates.php').then(res => res.json())
+            ]);
+
+            if (!productData.success || !productData.product) throw new Error('المنتج غير موجود');
+            
+            currentProduct = productData.product;
+            populateProductUI(currentProduct);
+
+            if (shippingData.success) {
+                shippingRates = shippingData.shipping_rates;
+                populateWilayaDropdown();
+            }
+            
+            setupForm();
+
+        } catch (error) {
+            document.body.innerHTML = `<h1>خطأ في تحميل الصفحة: ${error.message}</h1>`;
+        }
+    });
+
+    function populateProductUI(product) {
+        document.title = `${product.name} - SunStyle Algeria`;
+        document.getElementById('product-title').textContent = product.name;
+        document.getElementById('main-product-image').src = (product.images && product.images.length > 0) ? product.images[0] : '';
+        document.getElementById('productId').value = product.id;
+        document.getElementById('productPrice').value = product.discounted_price;
+    }
+
+    function populateWilayaDropdown() {
+        const wilayaSelect = document.getElementById('wilaya');
+        wilayaSelect.innerHTML = '<option value="">-- اختر ولاية التوصيل --</option>';
+        shippingRates.forEach(rate => {
+            const option = new Option(`${rate.wilaya_name} (+${rate.shipping_cost} دج)`, rate.wilaya_code);
+            option.dataset.cost = rate.shipping_cost;
+            option.dataset.name = rate.wilaya_name; // Important: Store the name here
+            wilayaSelect.appendChild(option);
+        });
+        wilayaSelect.addEventListener('change', updateOrderSummary);
+        updateOrderSummary();
+    }
+
+    function updateOrderSummary() {
+        const wilayaSelect = document.getElementById('wilaya');
+        const selectedOption = wilayaSelect.options[wilayaSelect.selectedIndex];
+        const shippingCost = selectedOption?.value ? parseFloat(selectedOption.dataset.cost) : 0;
+        
+        // THE FIX: Explicitly set the hidden input value
+        const wilayaName = selectedOption?.value ? selectedOption.dataset.name : '';
+        document.getElementById('wilayaNameInput').value = wilayaName;
+
+        document.getElementById('shippingCost').value = shippingCost;
+        const productPrice = parseFloat(currentProduct.discounted_price);
+        const totalPrice = productPrice + shippingCost;
+        
+        document.getElementById('summary-product-price').textContent = `${productPrice.toFixed(0)} دج`;
+        document.getElementById('summary-shipping-price').textContent = `${shippingCost.toFixed(0)} دج`;
+        document.getElementById('summary-total-price').textContent = `${totalPrice.toFixed(0)} دج`;
+    }
+    
+    function setupForm() {
+        document.getElementById('orderForm').addEventListener('submit', handleFormSubmit);
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const formData = new FormData(form);
+        const totalCost = parseFloat(document.getElementById('summary-total-price').textContent);
+        formData.append('total_cost', totalCost.toFixed(2));
+        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جاري الإرسال...';
+        
+        fetch('api/submit_order.php', { method: 'POST', body: new URLSearchParams(formData) })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessScreen();
+            } else {
+                showAlert(data.message || 'حدث خطأ غير متوقع');
+            }
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'اطلب الآن';
+        });
+    }
+
+    function showSuccessScreen() {
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('success-container').style.display = 'block';
+    }
+
+    function showAlert(message) {
+        const alertEl = document.getElementById('orderAlert');
+        alertEl.textContent = message;
+        alertEl.style.display = 'block';
+    }
+</script>
+</body>
+</html>

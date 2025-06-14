@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة منتج جديد - SunStyle Algeria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            direction: rtl;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #f1f5f9;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #e2e8f0;
+            color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 2rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1.25rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: #f9fafb;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        /* Images Container */
+        .images-container {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .images-container:hover {
+            border-color: #2563eb;
+            background: #f1f5f9;
+        }
+
+        .image-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .image-input input {
+            flex: 1;
+            margin: 0;
+        }
+
+        .remove-image {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-image:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .add-image {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .add-image:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1.25rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            text-decoration: none;
+            min-height: 56px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        /* Price Input Group */
+        .price-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Preview Images */
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f1f5f9;
+            aspect-ratio: 1;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .price-group {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container {
+                justify-content: center;
+            }
+
+            .image-input {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>SunStyle Algeria</h1>
+        <p>لوحة إدارة المنتجات</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link">
+                <span class="material-icons">home</span>
+                الصفحة الرئيسية
+            </a>
+            <a href="add.html" class="nav-link active">
+                <span class="material-icons">add_circle</span>
+                إضافة منتج
+            </a>
+            <a href="dashboard.html" class="nav-link">
+                <span class="material-icons">dashboard</span>
+                لوحة التحكم
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="form-card">
+            <h2 class="form-title">
+                <span class="material-icons">inventory</span>
+                إضافة منتج جديد
+            </h2>
+
+            <div id="alert" class="alert"></div>
+
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="name">اسم المنتج <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="مثال: نظارة شمسية راي بان كلاسيك">
+                </div>
+
+                <div class="price-group">
+                    <div class="form-group">
+                        <label for="original_price">السعر الأصلي <span class="required">*</span></label>
+                        <input type="number" id="original_price" name="original_price" required placeholder="0" min="0" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="discounted_price">السعر بعد التخفيض <span class="required">*</span></label>
+                        <input type="number" id="discounted_price" name="discounted_price" required placeholder="0" min="0" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>صور المنتج <span class="required">*</span></label>
+                    <div class="images-container">
+                        <div id="images-list">
+                            <div class="image-input">
+                                <input type="url" name="images[]" placeholder="رابط الصورة الأولى (مطلوب)" required>
+                                <button type="button" class="remove-image" onclick="removeImage(this)" style="display: none;">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-image" onclick="addImageField()">
+                            <span class="material-icons">add_photo_alternate</span>
+                            إضافة صورة أخرى
+                        </button>
+                        <small style="color: #64748b; margin-top: 0.5rem; display: block;">
+                            يمكنك إضافة روابط صور من مواقع مثل Imgur أو أي موقع استضافة صور آخر
+                        </small>
+                    </div>
+                </div>
+
+                <div id="image-previews" class="image-preview"></div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span class="material-icons">save</span>
+                    إضافة المنتج
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        let imageCount = 1;
+
+        // Add Image Field
+        function addImageField() {
+            imageCount++;
+            const imagesList = document.getElementById('images-list');
+            const newImageDiv = document.createElement('div');
+            newImageDiv.className = 'image-input';
+            newImageDiv.innerHTML = `
+                <input type="url" name="images[]" placeholder="رابط الصورة رقم ${imageCount}">
+                <button type="button" class="remove-image" onclick="removeImage(this)">
+                    <span class="material-icons">delete</span>
+                </button>
+            `;
+            imagesList.appendChild(newImageDiv);
+
+            // Show remove button for the first image if there are more than one
+            updateRemoveButtons();
+        }
+
+        // Remove Image Field
+        function removeImage(button) {
+            button.parentElement.remove();
+            imageCount--;
+            updateRemoveButtons();
+            updateImagePreviews();
+
+            // Update placeholders
+            const inputs = document.querySelectorAll('input[name="images[]"]');
+            inputs.forEach((input, index) => {
+                if (index === 0) {
+                    input.placeholder = "رابط الصورة الأولى (مطلوب)";
+                    input.required = true;
+                } else {
+                    input.placeholder = `رابط الصورة رقم ${index + 1}`;
+                    input.required = false;
+                }
+            });
+        }
+
+        // Update Remove Buttons
+        function updateRemoveButtons() {
+            const removeButtons = document.querySelectorAll('.remove-image');
+            const inputs = document.querySelectorAll('input[name="images[]"]');
+            
+            removeButtons.forEach((btn, index) => {
+                if (inputs.length > 1) {
+                    btn.style.display = 'flex';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+
+        // Update Image Previews
+        function updateImagePreviews() {
+            const previewContainer = document.getElementById('image-previews');
+            const inputs = document.querySelectorAll('input[name="images[]"]');
+            previewContainer.innerHTML = '';
+
+            inputs.forEach((input, index) => {
+                if (input.value.trim()) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'preview-item';
+                    previewDiv.innerHTML = `
+                        <img src="${input.value}" alt="معاينة ${index + 1}" onerror="this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><rect width=\"120\" height=\"120\" fill=\"%23f1f5f9\"/><text x=\"60\" y=\"60\" text-anchor=\"middle\" dy=\".3em\" font-family=\"Arial\" font-size=\"12\" fill=\"%2364748b\">صورة غير صالحة</text></svg>'">
+                        <button type="button" class="preview-remove" onclick="document.querySelectorAll('input[name=\\"images[]\\"')[${index}].value=''; updateImagePreviews();">×</button>
+                    `;
+                    previewContainer.appendChild(previewDiv);
+                }
+            });
+        }
+
+        // Listen to input changes for preview
+        document.addEventListener('input', function(e) {
+            if (e.target.name === 'images[]') {
+                setTimeout(updateImagePreviews, 500);
+            }
+        });
+
+        // Form Submission
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate that at least one image is provided
+            const imageInputs = document.querySelectorAll('input[name="images[]"]');
+            const hasValidImage = Array.from(imageInputs).some(input => input.value.trim() !== '');
+            
+            if (!hasValidImage) {
+                showAlert('يجب إضافة صورة واحدة على الأقل للمنتج', 'error');
+                return;
+            }
+
+            // Validate prices
+            const originalPrice = parseFloat(document.getElementById('original_price').value);
+            const discountedPrice = parseFloat(document.getElementById('discounted_price').value);
+
+            if (discountedPrice > originalPrice) {
+                showAlert('السعر بعد التخفيض لا يمكن أن يكون أكبر من السعر الأصلي', 'error');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const urlEncodedData = new URLSearchParams();
+            
+            // Handle form data conversion
+            for (const pair of formData) {
+                if (pair[0] === 'images[]' && pair[1].trim() !== '') {
+                    urlEncodedData.append('images[]', pair[1].trim());
+                } else if (pair[0] !== 'images[]') {
+                    urlEncodedData.append(pair[0], pair[1]);
+                }
+            }
+            
+            // Update button state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="material-icons">hourglass_empty</span> جاري الإضافة...';
+            submitBtn.disabled = true;
+            
+            fetch('api/add_product.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: urlEncodedData.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    this.reset();
+                    document.getElementById('image-previews').innerHTML = '';
+                    imageCount = 1;
+                    updateRemoveButtons();
+                    
+                    // Reset first input placeholder
+                    const firstInput = document.querySelector('input[name="images[]"]');
+                    firstInput.placeholder = "رابط الصورة الأولى (مطلوب)";
+                    firstInput.required = true;
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('حدث خطأ في إضافة المنتج. يرجى المحاولة مرة أخرى.', 'error');
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Show/Hide Alert
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.innerHTML = `
+                <span class="material-icons">
+                    ${type === 'success' ? 'check_circle' : 'error'}
+                </span>
+                ${message}
+            `;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'flex';
+            
+            // Auto hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Price validation
+        document.getElementById('original_price').addEventListener('input', validatePrices);
+        document.getElementById('discounted_price').addEventListener('input', validatePrices);
+
+        function validatePrices() {
+            const originalPrice = parseFloat(document.getElementById('original_price').value) || 0;
+            const discountedPrice = parseFloat(document.getElementById('discounted_price').value) || 0;
+            
+            const discountedInput = document.getElementById('discounted_price');
+            
+            if (discountedPrice > originalPrice && originalPrice > 0) {
+                discountedInput.style.borderColor = '#ef4444';
+                discountedInput.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.1)';
+            } else {
+                discountedInput.style.borderColor = '#e5e7eb';
+                discountedInput.style.boxShadow = '';
+            }
+        }
+    </script>
+</body>
+</html>
+

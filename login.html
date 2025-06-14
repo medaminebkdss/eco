@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل دخول المدير - SunStyle Algeria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            direction: rtl;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #334155;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Login Card */
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 4px 20
+            px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        .login-card h2 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: #f9fafb;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>تسجيل دخول المدير</h2>
+        <div id="alert" class="alert"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">اسم المستخدم</label>
+                <input type="text" id="username" name="username" required placeholder="أدخل اسم المستخدم">
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" name="password" required placeholder="أدخل كلمة المرور">
+            </div>
+            <button type="submit" class="btn">تسجيل الدخول</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const urlEncodedData = new URLSearchParams();
+
+            for (const pair of formData) {
+                urlEncodedData.append(pair[0], pair[1]);
+            }
+
+            fetch('api/admin_login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: urlEncodedData.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = 'dashboard.html'; // Redirect to dashboard
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('حدث خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى.', 'error');
+            });
+        });
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.innerHTML = `
+                <span class="material-icons">
+                    ${type === 'success' ? 'check_circle' : 'error'}
+                </span>
+                ${message}
+            `;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
